@@ -10,6 +10,7 @@ const app = express();
 //Middlewares
 app.use(express.json());
 
+
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO);
@@ -26,3 +27,12 @@ app.listen(process.env.PORT, () => {
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
+
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server error";
+  res.status(statusCode).json({
+    success: false,
+    message,
+  });
+});
