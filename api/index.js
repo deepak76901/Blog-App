@@ -1,7 +1,28 @@
 import express from "express";
+import mongoose from "mongoose";
+import { config } from "dotenv";
+import userRoutes from "./routes/user.route.js";
+import authRoutes from "./routes/auth.route.js";
+config();
 
 const app = express();
 
-app.listen(3000 , () => {
-    console.log("Server is Listening on Port:3000")
-})
+//Middlewares
+app.use(express.json());
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO);
+    console.log("Database connected Successfully");
+  } catch (error) {
+    console.log("Database connection failed : ", error);
+  }
+};
+connectDB();
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server is Listening on Port:${process.env.PORT}`);
+});
+
+app.use("/api/user", userRoutes);
+app.use("/api/auth", authRoutes);
