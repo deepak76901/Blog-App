@@ -19,7 +19,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col sm:flex-row" >
       {/* SideBar */}
-      <div>
+      <div className="sm:w-56">
         <DashSidebar />
       </div>
       {/* Profile */}
