@@ -3,12 +3,14 @@ import mongoose from "mongoose";
 import { config } from "dotenv";
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
+import cookieParser from "cookie-parser";
 config();
 
 const app = express();
 
 //Middlewares
 app.use(express.json());
+app.use(cookieParser())
 
 
 const connectDB = async () => {
