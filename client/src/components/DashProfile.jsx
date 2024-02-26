@@ -25,6 +25,7 @@ import {
   deleteUserStart,
   deleteUserFailure,
   deleteUserSuccess,
+  signOutSuccess,
 } from "../redux/user/userSlice";
 
 export default function DashProfile() {
@@ -160,6 +161,23 @@ export default function DashProfile() {
     }
   };
 
+  const handleSignOut =async (e) => {
+    try {
+      const res = await fetch("/api/user/signout",{
+        method:"POST"
+      })
+
+      const data = res.json();
+      if(!res.ok){
+        console.log(data.message)
+      }else{
+        dispatch(signOutSuccess())
+      }
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
   return (
     <div className="max-w-lg mx-auto p-3 w-full">
       <h1 className="my-7 text-center font-semibold text-3xl">Profile</h1>
@@ -244,7 +262,7 @@ export default function DashProfile() {
         </Button>
         <div className="flex justify-between font-semibold text-red-500 px-4 cursor-pointer">
           <span onClick={() => setShowDeleteModal(true)}>Delete Account</span>
-          <span>Sign Out</span>
+          <span onClick={handleSignOut} >Sign Out</span>
         </div>
       </form>
       <Modal
