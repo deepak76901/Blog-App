@@ -1,5 +1,13 @@
 import { useSelector, useDispatch } from "react-redux";
-import { Alert, Button, TextInput } from "flowbite-react";
+import {
+  Alert,
+  Button,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  TextInput,
+} from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { useEffect, useRef, useState } from "react";
 import {
   getDownloadURL,
@@ -14,10 +22,13 @@ import {
   updateStart,
   updateSuccess,
   updateFailure,
+  deleteUserStart,
+  deleteUserFailure,
+  deleteUserSuccess,
 } from "../redux/user/userSlice";
 
 export default function DashProfile() {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser,error } = useSelector((state) => state.user);
   const [imageFile, setImageFile] = useState(null);
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
@@ -25,6 +36,7 @@ export default function DashProfile() {
   const [imageFileUploading, setImageFileUploading] = useState(false);
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
   const [updateUserFailure, setUpdateUserFailure] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [formData, setFormData] = useState({});
   const filePickerRef = useRef();
   const dispatch = useDispatch();
@@ -95,8 +107,8 @@ export default function DashProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setUpdateUserFailure(null)
-    setUpdateUserSuccess(null)
+    setUpdateUserFailure(null);
+    setUpdateUserSuccess(null);
     if (Object.keys(formData).length === 0) {
       setUpdateUserFailure("No changes made");
       return;
@@ -126,6 +138,25 @@ export default function DashProfile() {
     } catch (error) {
       dispatch(updateFailure(error.message));
       setUpdateUserFailure(data.message);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    setShowDeleteModal(false);
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if(!res.ok){
+        dispatch(deleteUserFailure(data.message))
+      }else{
+        dispatch(deleteUserSuccess(data))
+      }
+
+    } catch (error) {
+      dispatch(deleteUserFailure(error))
     }
   };
 
@@ -205,14 +236,42 @@ export default function DashProfile() {
         {updateUserFailure && (
           <Alert color="failure">{updateUserFailure}</Alert>
         )}
+        {error && (
+          <Alert color="failure">{error}</Alert>
+        )}
         <Button type="submit" gradientDuoTone="purpleToBlue" outline>
           Update
         </Button>
         <div className="flex justify-between font-semibold text-red-500 px-4 cursor-pointer">
-          <span>Delete Account</span>
+          <span onClick={() => setShowDeleteModal(true)}>Delete Account</span>
           <span>Sign Out</span>
         </div>
       </form>
+      <Modal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        popup
+        size="md"
+        className="h-24"
+      >
+        <ModalHeader />
+        <ModalBody>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className="h-12 w-12 text-gray-400 dark:text-gray-200 mx-auto mb-4" />
+            <h3 className="mx-auto mb-5  text-lg text-gray-500 dark:text-gray-300">
+              Are you sure you want to delete your Account?
+            </h3>
+            <div className="flex justify-center gap-4">
+              <Button color="failure" onClick={handleDeleteUser}>
+                Yes, I'm sure
+              </Button>
+              <Button color="gray" onClick={() => setShowDeleteModal(false)}>
+                No, Cancel
+              </Button>
+            </div>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   );
 }

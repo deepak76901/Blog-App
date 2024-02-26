@@ -6,11 +6,11 @@ export const verifyToken = (req, res, next) => {
   if (!token) {
     return next(errorHandler(401, "Unauthorized"));
   }
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
     if (err) {
       return next(errorHandler(401, "Unauthorized"));
     }
-    req.user = user;
+    req.user = decoded;
     next();
   });
 };
