@@ -11,6 +11,9 @@ export const verifyToken = (req, res, next) => {
       return next(errorHandler(401, "Unauthorized"));
     }
     req.user = decoded;
+    /* jo main jwt.sign() krte time payload dunga, vhi return m aayega,jaise abhi decoded me aaya h
+     console.log(req.user);
+     */
     next();
   });
 };
