@@ -13,7 +13,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 export default function CreatePost() {
-  const [imageFile, setimageFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
@@ -55,12 +55,16 @@ export default function CreatePost() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  };
+
   return (
     <div className="p-3 max-w-3xl mx-auto min-h-screen">
       <h1 className="text-center text-3xl my-7 font-semibold text-gray-700">
         Create a Post
       </h1>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
           <TextInput
             type="text"
@@ -68,8 +72,15 @@ export default function CreatePost() {
             required
             id="title"
             className="flex-1"
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
           />
-          <Select>
+          <Select
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+          >
             <option value="uncategorized">Select a category</option>
             <option value="javascript">JavaScript</option>
             <option value="react">React</option>
@@ -80,7 +91,7 @@ export default function CreatePost() {
           <FileInput
             type="file"
             accept="image/*"
-            onChange={(e) => setimageFile(e.target.files[0])}
+            onChange={(e) => setImageFile(e.target.files[0])}
           />
           <Button
             type="button"
@@ -115,6 +126,7 @@ export default function CreatePost() {
           className="h-48 mb-12"
           placeholder="Write something..."
           required
+          onChange={(value) => setFormData({ ...formData, content: value })}
         />
         <Button type="submit" gradientDuoTone="purpleToPink" className="">
           Publish
