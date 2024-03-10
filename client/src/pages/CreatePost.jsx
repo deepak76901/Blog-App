@@ -11,12 +11,16 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import {useNavigate} from "react-router-dom"
 
 export default function CreatePost() {
+  const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
   const [imageUploadError, setImageUploadError] = useState(null);
   const [formData, setFormData] = useState({});
+  const [publishError, setPublishError] = useState(null);
+  console.log(formData,publishError);
 
   const handleUploadImage = async () => {
     try {
@@ -57,6 +61,25 @@ export default function CreatePost() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      const res = await fetch("/api/post/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      console.log(data);
+      if (!res.ok) {
+        setPublishError(data.message);
+        return;
+      } else {
+        setPublishError(null);
+        navigate(`/post/${data.slug}`)
+      }
+    } catch (error) {
+      setPublishError("Something went wrong");
+    }
   };
 
   return (
@@ -131,6 +154,7 @@ export default function CreatePost() {
         <Button type="submit" gradientDuoTone="purpleToPink" className="">
           Publish
         </Button>
+        {publishError && <Alert color="failure">{publishError}</Alert>}
       </form>
     </div>
   );
