@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Post() {
   return (
-    <div>
+    <div className='min-h-screen'>
       
     </div>
   )
