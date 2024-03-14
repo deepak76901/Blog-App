@@ -81,7 +81,7 @@ export default function DashPosts() {
   };
 
   return (
-    <div className="table-auto md:mx-auto overflow-x-scroll  scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-gray-400   dark:scrollbar-thumb-slate-600 p-3 md:overflow-x-auto">
+    <div className="table-auto md:mx-auto overflow-x-scroll  scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-gray-400   dark:scrollbar-thumb-slate-600 p-3 md:overflow-x-auto sm:max-w-[70vw]">
       {currentUser.isAdmin && userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md divide-y">
@@ -106,7 +106,7 @@ export default function DashPosts() {
                       <img
                         src={post.image}
                         alt={post.title}
-                        className=" w-24 object-cover bg-gray-400"
+                        className=" w-16 h-10 object-cover bg-gray-400"
                       />
                     </Link>
                   </TableCell>
