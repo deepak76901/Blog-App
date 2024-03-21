@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, Textarea, Alert } from "flowbite-react";
 import { useState, useEffect } from "react";
 import Comment from "./Comment";
@@ -9,6 +9,7 @@ export default function CommentSection({ postId }) {
   const [comment, setComment] = useState("");
   const [commentError, setCommentError] = useState(null);
   const [comments, setComments] = useState([]);
+  const navigate = useNavigate();
   console.log(comments);
 
   const handleSubmit = async (e) => {
@@ -34,10 +35,39 @@ export default function CommentSection({ postId }) {
       if (res.ok) {
         setComment("");
         setCommentError(null);
-        setComments([data, ...comments])
+        setComments([data, ...comments]);
       }
     } catch (error) {
       setCommentError(error.message);
+    }
+  };
+
+  const handleLike = async (commentId) => {
+    try {
+      if (!currentUser) {
+        return navigate("/sign-in");
+        
+      }
+      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+        method: "PUT",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setComments(
+          comments.map((comment) => {
+            comment._id === commentId
+              ? {
+                  ...comment,
+                  likes: data.likes,
+                  numberOfLikes: data.numberOfLikes,
+                }
+              : comment;
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   };
 
@@ -123,7 +153,11 @@ export default function CommentSection({ postId }) {
           </p>
           {comments.map((comment) => (
             <div className="flex justify-center w-full my-2 ">
-              <Comment key={comment._id} comment={comment} />
+              <Comment
+                key={comment._id}
+                comment={comment}
+                onLike={handleLike}
+              />
             </div>
           ))}
         </>
