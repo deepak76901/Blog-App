@@ -69,14 +69,16 @@ export default function DashPosts() {
           method: "DELETE",
         }
       );
-      const data = await res.json()
-      if(!res.ok){
-        console.log(data.message)
-      }else{
-        setUserPosts((prev) => prev.filter((post) => post._id !== postIdToDelete))
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        setUserPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToDelete)
+        );
       }
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   };
 
@@ -97,7 +99,10 @@ export default function DashPosts() {
             </TableHead>
             <TableBody className="divide-y">
               {userPosts.map((post) => (
-                <TableRow className="bg-white dark:bg-gray-800 divide-x">
+                <TableRow
+                  className="bg-white dark:bg-gray-800 divide-x"
+                  key={post._id}
+                >
                   <TableCell className="text-gray-800 dark:text-white">
                     {new Date(post.updatedAt).toLocaleDateString()}
                   </TableCell>
