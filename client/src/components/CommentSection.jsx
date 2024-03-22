@@ -188,7 +188,7 @@ export default function CommentSection({ postId }) {
             </span>
           </p>
           {comments.map((comment) => (
-            <div>
+            <div className="flex justify-center">
               <Comment
                 key={comment._id}
                 comment={comment}
