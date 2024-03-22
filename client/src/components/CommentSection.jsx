@@ -46,7 +46,6 @@ export default function CommentSection({ postId }) {
     try {
       if (!currentUser) {
         return navigate("/sign-in");
-        
       }
       const res = await fetch(`/api/comment/likeComment/${commentId}`, {
         method: "PUT",
@@ -86,6 +85,14 @@ export default function CommentSection({ postId }) {
     };
     getComments();
   }, [postId]);
+
+  const handleEdit = async (comment, editedContent) => {
+    setComments(
+      comments.map((c) =>
+        c._id === comment._id ? { ...c, content: editedContent } : c
+      )
+    );
+  };
 
   return (
     <div className="max-w-2xl mx-auto w-full p-3">
@@ -152,11 +159,12 @@ export default function CommentSection({ postId }) {
             </span>
           </p>
           {comments.map((comment) => (
-            <div className="flex justify-center w-full my-2 ">
+            <div>
               <Comment
                 key={comment._id}
                 comment={comment}
                 onLike={handleLike}
+                onEdit={handleEdit}
               />
             </div>
           ))}
