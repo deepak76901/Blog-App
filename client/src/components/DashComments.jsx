@@ -14,22 +14,23 @@ import {
 } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { FaCheck, FaTimes } from "react-icons/fa";
 
-export default function DashPosts() {
+export default function DashComments() {
   const { currentUser } = useSelector((state) => state.user);
-  const [userPosts, setUserPosts] = useState([]);
+  const [comments, setComments] = useState([]);
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [postIdToDelete, setPostIdToDelete] = useState(null);
+  const [commentIdToDelete, setCommentIdToDelete] = useState(null);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
+        const res = await fetch(`/api/comment/getcomments/${currentUser._id}`);
         const data = await res.json();
         if (res.ok) {
-          setUserPosts(data.posts);
-          if (data.posts.length < 9) {
+          setComments(data.comments);
+          if (data.comments.length < 9) {
             setShowMore(false);
           }
         }
@@ -38,20 +39,20 @@ export default function DashPosts() {
       }
     };
     if (currentUser.isAdmin) {
-      fetchPosts();
+      fetchComments();
     }
   }, []);
 
   const handleShowMore = async () => {
-    const startIndex = userPosts.length;
+    const startIndex = comments.length;
     try {
       const res = await fetch(
-        `/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
+        `/api/comment/getComments?startIndex=${startIndex}`
       );
       const data = await res.json();
       if (res.ok) {
-        setUserPosts((prev) => [...prev, ...data.posts]);
-        if (data.posts.length < 9) {
+        setComments((prev) => [...prev, ...data.comments]);
+        if (data.comments.length < 9) {
           setShowMore(false);
         }
       }
@@ -60,90 +61,74 @@ export default function DashPosts() {
     }
   };
 
-  const handleDeletePost = async () => {
+  const handleDeleteComment = async () => {
     setShowModal(false);
     try {
       const res = await fetch(
-        `/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
+        `/api/comment/deleteComment/${commentIdToDelete}`,
         {
           method: "DELETE",
         }
       );
       const data = await res.json();
-      if (!res.ok) {
-        console.log(data.message);
-      } else {
-        setUserPosts((prev) =>
-          prev.filter((post) => post._id !== postIdToDelete)
+
+      if (res.ok) {
+        setComments((prev) =>
+          prev.filter((comment) => comment._id !== commentIdToDelete)
         );
+        setShowModal(false);
+      } else {
+        console.log(data.message);
       }
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
   };
 
   return (
     <div className="table-auto md:mx-auto overflow-x-scroll  scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-gray-400   dark:scrollbar-thumb-slate-600 p-3 md:overflow-x-auto sm:max-w-[70vw]">
-      {currentUser.isAdmin && userPosts.length > 0 ? (
+      {currentUser.isAdmin && comments.length > 0 ? (
         <>
-          <Table hoverable className="shadow-md divide-y">
+          <Table hoverable className="shadow-md divide-y ">
             <TableHead>
               <TableHeadCell>Date Updated</TableHeadCell>
-              <TableHeadCell>Post Image</TableHeadCell>
-              <TableHeadCell>Post Title</TableHeadCell>
-              <TableHeadCell>Category</TableHeadCell>
+              <TableHeadCell>Comment Content</TableHeadCell>
+              <TableHeadCell>Number of Likes</TableHeadCell>
+              <TableHeadCell>PostId</TableHeadCell>
+              <TableHeadCell>UserId</TableHeadCell>
               <TableHeadCell>Delete</TableHeadCell>
-              <TableHeadCell>
-                <span>Edit</span>
-              </TableHeadCell>
             </TableHead>
             <TableBody className="divide-y">
-              {userPosts.map((post) => (
+              {comments.map((comment) => (
                 <TableRow
                   className="bg-white dark:bg-gray-800 divide-x"
-                  key={post._id}
+                  key={comment._id}
                 >
                   <TableCell className="text-gray-800 dark:text-white">
-                    {new Date(post.updatedAt).toLocaleDateString()}
+                    {new Date(comment.updatedAt).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
-                    <Link to={`/post/${post.slug}`}>
-                      <img
-                        src={post.image}
-                        alt={post.title}
-                        className=" w-16 h-10 object-cover bg-gray-400"
-                      />
-                    </Link>
+                  <TableCell className="font-medium ">
+                    <p className="line-clamp-3">{comment.content}</p>
                   </TableCell>
-                  <TableCell>
-                    <Link
-                      to={`/post/${post.slug}`}
-                      className="flex items-center hover:underline cursor-pointer font-medium text-gray-800 dark:text-white"
-                    >
-                      <p className="line-clamp-2">{post.title}</p>
-                    </Link>
+                  <TableCell className="font-medium">
+                    {comment.numberOfLikes}
                   </TableCell>
-                  <TableCell className="text-gray-800 dark:text-white">
-                    {post.category}
+                  <TableCell className="font-medium">
+                    {comment.postId}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {comment.userId}
                   </TableCell>
                   <TableCell>
                     <span
                       className="text-red-600 dark:text-red-500 hover:underline cursor-pointer font-medium"
                       onClick={() => {
                         setShowModal(true);
-                        setPostIdToDelete(post._id);
+                        setCommentIdToDelete(comment._id);
                       }}
                     >
                       Delete
                     </span>
-                  </TableCell>
-                  <TableCell>
-                    <Link
-                      to={`/update-post/${post._id}`}
-                      className="hover:underline text-teal-700  dark:text-teal-500 cursor-pointer font-medium"
-                    >
-                      <span>Edit</span>
-                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
@@ -159,7 +144,7 @@ export default function DashPosts() {
           )}
         </>
       ) : (
-        <p>You have no posts yet.</p>
+        <p>You have no comments yet.</p>
       )}
       <Modal
         show={showModal}
@@ -173,10 +158,10 @@ export default function DashPosts() {
           <div className="text-center">
             <HiOutlineExclamationCircle className="h-12 w-12 text-gray-400 dark:text-gray-200 mx-auto mb-4" />
             <h3 className="mx-auto mb-5  text-lg text-gray-500 dark:text-gray-300">
-              Are you sure you want to delete the Post?
+              Are you sure you want to delete this Comment?
             </h3>
             <div className="flex justify-center gap-4">
-              <Button color="failure" onClick={handleDeletePost}>
+              <Button color="failure" onClick={handleDeleteComment}>
                 Yes, I'm sure
               </Button>
               <Button color="gray" onClick={() => setShowModal(false)}>
