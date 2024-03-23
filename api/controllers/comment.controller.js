@@ -103,7 +103,7 @@ export const getComments = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 9;
     const sortDirection = req.query.sort === "asc" ? 1 : -1;
 
-    const comments = await Comment.find({ userId: req.params.userId })
+    const comments = await Comment.find({ userId: req.user.id })
       .sort({
         updatedAt: sortDirection,
       })

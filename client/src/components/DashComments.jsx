@@ -26,7 +26,7 @@ export default function DashComments() {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`/api/comment/getcomments/${currentUser._id}`);
+        const res = await fetch(`/api/comment/getComments`);
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);
