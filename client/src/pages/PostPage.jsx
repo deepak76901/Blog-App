@@ -12,7 +12,6 @@ export default function PostPage() {
   const [error, setError] = useState(false);
   const [post, setPost] = useState(null);
   const [recentPosts, setRecentPosts] = useState([]);
-  console.log(recentPosts);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -93,7 +92,7 @@ export default function PostPage() {
       </div>
       {post && <CommentSection postId={post._id} />}
       <div className="flex flex-col justify-center items-center my-3">
-        <h className="text-xl">Recent articles</h>
+        <h1 className="text-xl">Recent articles</h1>
         <div className="flex flex-wrap gap-5 mt-5 justify-center">
           {recentPosts.map((post) => (
             <PostCard key={post._id} post={post} />
