@@ -30,12 +30,6 @@ app.listen(process.env.PORT, () => {
   console.log(`Server is Listening on Port:${process.env.PORT}`);
 });
 
-
-
-app.get("/", (req, res) => {
-  res.send("Server is Running");
-});
-
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/post", postRoutes);
